@@ -1,0 +1,41 @@
+name: 基金监控定时任务
+
+on:
+  schedule:
+    # 每个工作日北京时间 10:00 执行 (UTC 时间 02:00)
+    - cron: '0 2 * * 1-5'
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  fund-monitor:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置 Python 环境
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+    
+    - name: 安装依赖
+      run: |
+        pip install akshare prettytable schedule pytz -i https://pypi.tuna.tsinghua.edu.cn/simple
+    
+    - name: 运行基金监控脚本
+      run: |
+        python fund_monitor.py
+      env:
+        TZ: Asia/Shanghai
+    
+    - name: 上传监控结果
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: fund-monitor-result-${{ github.run_number }}
+        path: |
+          *.log
+          *.txt
+        retention-days: 30
