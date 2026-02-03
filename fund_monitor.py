@@ -12,6 +12,7 @@ from prettytable import PrettyTable
 import pytz
 import json
 import os
+import requests
 
 # ===================== 配置区 =====================
 # 设置北京时区
@@ -116,6 +117,39 @@ def simulate_investment(info, curr_nav):
     return new_shares, avg_cost
 
 
+def send_serverchan_notification(title, content):
+    """
+    发送 Server酱 通知到微信
+    
+    Args:
+        title: 通知标题
+        content: 通知内容（支持 Markdown）
+    """
+    sendkey = os.environ.get('SERVER_CHAN_KEY')
+    if not sendkey:
+        print("⚠️ 未配置 SERVER_CHAN_KEY，跳过通知发送")
+        return False
+    
+    url = f"https://sctapi.ftqq.com/{sendkey}.send"
+    
+    try:
+        response = requests.post(url, data={
+            "title": title,
+            "desp": content
+        }, timeout=10)
+        
+        result = response.json()
+        if result.get('code') == 0:
+            print(f"✅ Server酱通知发送成功")
+            return True
+        else:
+            print(f"⚠️ Server酱通知发送失败: {result.get('message', '未知错误')}")
+            return False
+    except Exception as e:
+        print(f"❌ Server酱通知发送异常: {e}")
+        return False
+
+
 def generate_report():
     """生成监控报告"""
     peak_record = load_peak_record()
@@ -210,6 +244,38 @@ def generate_report():
         }, f, ensure_ascii=False, indent=2)
     
     print("\n✅ 监控完成，结果已保存到 fund_monitor_result.txt 和 fund_monitor_result.json")
+    
+    # 检查是否需要发送通知
+    alert_funds = [r for r in results if r['advice'] in ['🚨 趋势反转(止盈)', '⚠️ 触发回撤']]
+    
+    if alert_funds:
+        # 构建通知内容
+        notification_title = f"📊 基金监控提醒 ({len(alert_funds)}只基金)"
+        notification_content = f"## 📊 基金监控提醒\n\n"
+        notification_content += f"**时间**: {get_now_beijing().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        
+        for fund in alert_funds:
+            icon = "🚨" if fund['advice'] == "🚨 趋势反转(止盈)" else "⚠️"
+            notification_content += f"### {icon} {fund['name']} - {fund['advice']}\n"
+            notification_content += f"- 当前净值: **{fund['nav']:.4f}**\n"
+            notification_content += f"- 动态成本: {fund['cost']:.4f}\n"
+            notification_content += f"- 收益率: **{fund['profit_rate']:.2%}**\n"
+            notification_content += f"- 盈利金额: **{fund['profit_amount']:.2f}元**\n"
+            notification_content += f"- 回撤: {fund['drawdown']:.2%}\n"
+            
+            if fund['advice'] == "🚨 趋势反转(止盈)":
+                notification_content += f"\n**建议**: 考虑止盈锁定利润\n"
+            else:
+                notification_content += f"\n**建议**: 警惕回撤风险\n"
+            
+            notification_content += "\n---\n\n"
+        
+        notification_content += f"[查看详细报告](https://github.com/cryboy007/fund-monitor/actions)"
+        
+        # 发送通知
+        send_serverchan_notification(notification_title, notification_content)
+    else:
+        print("\n💡 当前无需发送通知（未触发止盈或回撤警告）")
 
 
 if __name__ == "__main__":

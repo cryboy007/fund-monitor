@@ -109,9 +109,34 @@ python fund_monitor.py
 
 ## 🛠️ 高级配置
 
-### 添加通知功能
+### 📱 微信通知（Server酱）
 
-可以集成 Telegram、企业微信等通知渠道，在触发止盈信号时发送提醒。
+本项目已集成 **Server酱** 微信通知功能，在触发止盈或回撤警告时自动发送微信提醒。
+
+#### 快速配置（3分钟）
+
+1. **获取 SendKey**
+   - 访问 https://sct.ftqq.com/
+   - 微信扫码登录
+   - 复制您的 SendKey
+
+2. **配置 GitHub Secret**
+   - 仓库 → Settings → Secrets and variables → Actions
+   - 新建 Secret：
+     - Name: `SERVER_CHAN_KEY`
+     - Value: 粘贴您的 SendKey
+
+3. **关注服务号**
+   - 扫描 Server酱 网站上的二维码
+   - 关注"方糖服务号"接收通知
+
+**详细配置指南**: 查看 [SERVER_CHAN_SETUP.md](SERVER_CHAN_SETUP.md)
+
+#### 通知触发条件
+
+仅在以下情况发送通知（避免消息过多）：
+- 🚨 **趋势反转(止盈)**: 收益达标 + 跌破MA20 + 回撤超标
+- ⚠️ **触发回撤**: 收益达标 + 回撤超标
 
 ### 自定义策略
 

@@ -2,3 +2,4 @@ akshare
 prettytable
 schedule
 pytz
+requests
