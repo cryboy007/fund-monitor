@@ -178,9 +178,12 @@ def simulate_investment_accurate(info, code, curr_nav):
         total_shares = info['init_shares']
         total_cost = info['init_shares'] * info['init_cost']
         
+        # 获取当前日期（不带时区）
+        today = pd.Timestamp.now().normalize()
+        
         # 模拟每次定投
         current_date = start_date + pd.Timedelta(days=info['invest_cycle'])
-        while current_date <= pd.Timestamp.now(tz=TZ_CHINA):
+        while current_date <= today:
             # 找到最近的交易日净值
             available_navs = df[df['净值日期'] <= current_date]
             if len(available_navs) > 0:
