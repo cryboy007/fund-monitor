@@ -3,3 +3,5 @@ prettytable
 schedule
 pytz
 requests
+numpy
+pandas
