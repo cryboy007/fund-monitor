@@ -59,6 +59,36 @@ PORTFOLIO = {
         "target": 0.15, 
         "callback": 0.06, 
         "start_date": "2026-02-02"
+    },
+    "009974": {
+        "name": "华宝标普美国消费",
+        "init_cost": 2.985, 
+        "init_shares": 505.87,
+        "invest_amount": 100, 
+        "invest_cycle": 1,
+        "target": 0.15, 
+        "callback": 0.06, 
+        "start_date": "2026-02-02"
+    },
+    "016858": {
+        "name": "华安纳指100联接A",
+        "init_cost": 3.2421, 
+        "init_shares": 925.33,
+        "invest_amount": 100, 
+        "invest_cycle": 1,
+        "target": 0.15, 
+        "callback": 0.06, 
+        "start_date": "2026-02-02"
+    },
+    "501312": {
+        "name": "华宝海外科技",
+        "init_cost": 2.0831, 
+        "init_shares": 105.61,
+        "invest_amount": 100, 
+        "invest_cycle": 1,
+        "target": 0.15, 
+        "callback": 0.06, 
+        "start_date": "2026-02-02"
     }
 }
 
